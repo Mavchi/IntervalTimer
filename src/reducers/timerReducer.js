@@ -1,3 +1,16 @@
+/*
+State looks like:
+currentType: "Prepare",
+index: 0,
+playList: [{
+  type: "Prepare",
+  time: 45000
+}]
+running: false,
+timeLast: 1616745690462,
+timeLeft: 43000,
+*/
+
 const initialState = {
   timeLast: null, // last time update was called
   timeLeft: 0,
@@ -13,8 +26,11 @@ export const timerTypes = {
 };
 
 export const workoutTypes = {
-    
-}
+  PREPARE: "Prepare",
+  REST: "Rest",
+  WORK: "Work",
+  FINISHED: "Finished",
+};
 
 const timerReducer = (state = initialState, action) => {
   const newState = { ...state };
@@ -26,20 +42,24 @@ const timerReducer = (state = initialState, action) => {
       newState.running = true;
       return newState;
     case timerTypes.UPDATE_TIMER:
-      if (!newState.running || newState.playList[newState.index]==='Finished') {
-        return state;
+      if (
+        !newState.running ||
+        newState.playList[newState.index] === workoutTypes.FINISHED
+      ) {
+        newState.running = false;
+        return newState;
       }
       newState.timeLeft -= new Date().getTime() - newState.timeLast;
       newState.timeLast = new Date().getTime();
 
       if (newState.timeLeft <= 0) {
-        newState.index += 1
-
-        if (!newState.playList[newState.index] === "Finished") {
-
+        newState.index += 1;
+        
+        if (newState.playList[newState.index].type !== workoutTypes.FINISHED) {
+          console.log('onnistuu')
+            newState.timeLeft = newState.playList[newState.index].time
+            newState.currentType = newState.playList[newState.index].type
         }
-          newState.timeLeft = 0;
-        newState.running = false;
       }
       return newState;
     case timerTypes.RESET_TIMER:
@@ -62,36 +82,44 @@ export const initializeTimer = (workout) => {
     };
     newTimer.playList = [];
     newTimer.index = 0;
-    newTimer.playList.push({
-      type: "Prepare",
-      time: workout.prepare,
-    });
+
+    // no need for prepare-timer, if its 0
+    if (workout.prepare !== 0) {
+      newTimer.currentType = workoutTypes.PREPARE;
+      newTimer.playList.push({
+        type: workoutTypes.PREPARE,
+        time: workout.prepare * 1000,
+      });
+    } else {
+      // no need for prepare-timer, if its 0
+      newTimer.currentType = workoutTypes.WORK;
+    }
     for (let i = 0; i < workout.rounds; i++) {
       for (let j = 0; j < workout.sets; j++) {
         newTimer.playList.push({
-          type: "Work",
-          time: workout.work,
+          type: workoutTypes.WORK,
+          time: workout.work * 1000,
         });
         if (j !== workout.sets - 1) {
           newTimer.playList.push({
-            type: "Rest",
-            time: workout.restBetweenSets,
+            type: workoutTypes.REST,
+            time: workout.restBetweenSets * 1000,
           });
         } else {
           if (i !== workout.rounds - 1) {
             newTimer.playList.push({
-              type: "Rest",
-              time: workout.restBetweenRounds,
+              type: workoutTypes.REST,
+              time: workout.restBetweenRounds * 1000,
             });
           }
         }
       }
     }
     newTimer.playList.push({
-      type: "Finished",
+      type: workoutTypes.FINISHED,
       time: 0,
     });
-    newTimer.timeLeft = newTimer.playList[0].time * 1000;
+    newTimer.timeLeft = newTimer.playList[0].time
 
     dispatch({
       type: timerTypes.SET_TIMER,
