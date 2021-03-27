@@ -8,6 +8,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Switch from "@material-ui/core/Switch";
 import Slider from "@material-ui/core/Slider";
+import Divider from '@material-ui/core/Divider'
 
 import IconBack from "@material-ui/icons/ArrowBackIosRounded";
 import VolumeDown from "@material-ui/icons/VolumeDown";
@@ -25,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     backgroundColor: "white",
-    borderBottom: "1px solid grey",
     alignItems: "center",
   },
   controls: {
@@ -90,6 +90,8 @@ const Settings = ({ type }) => {
           <VolumeUp />
         </div>
 
+        <Divider />
+
         <div className={classes.root}>
           <Typography component="h5" variant="h5">
             Vibration
@@ -104,7 +106,6 @@ const Settings = ({ type }) => {
             />
           </div>
         </div>
-        
       </main>
     </React.Fragment>
   );
