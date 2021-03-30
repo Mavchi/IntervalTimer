@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { initializeSettings } from "./reducers/settingsReducer";
-import Timer from './components/Timer'
-import Settings from './components/Settings'
-import Main from './components/Main'
+import './base.scss'
+
+import Main from './components/Main/Main'
 
 const App = () => {
   const dispatch = useDispatch()
